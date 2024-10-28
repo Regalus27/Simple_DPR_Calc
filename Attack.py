@@ -23,7 +23,14 @@ class Attack:
     
     def display(self):
         result = ''
-        result += f'{self.name:<42}{self.calc_total_damage():>5.2f} Average Damage\n'
+        result += f'{self.name:<42}{self.calc_total_damage():>5.2f} Average Attack Damage\n'
         for damage_event in self.damage_events:
             result += damage_event.display(self.crit_chance, self.miss_chance) + '\n'
         return result
+    
+    def modify_crit(self, new_crit_chance=0.05, new_miss_chance=0.4):
+        """
+        Used to modify critical strike chance partway through a round, if that somehow happens.
+        """
+        self.crit_chance = new_crit_chance
+        self.miss_chance = new_miss_chance
