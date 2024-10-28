@@ -19,7 +19,7 @@ class Combat:
 
         self.description = tactics_description
         self.level = validate_level(level)
-        self.rounds = validate_rounds(rounds)
+        self.rounds = validate_rounds(rounds, combat_length)
 
     def calc_damage_per_round(self):
         """
@@ -32,11 +32,27 @@ class Combat:
         Max combat_length is 50.
         """
         total = 0
-        round_count = len(self.rounds)
-        # Rounds are 1-indexed, adjust for loop
-        for i in range(1, self.combat_length + 1):
-            # validate_rounds sets up for this to work.
-            pass
+        for round in self.rounds:
+            total += round.calc_round_damage()
+        return total / self.combat_length
+    
+    def display(self, verbose=False):
+        """
+        Level X:    X Average DPR\n
+            Description\n
+        for round in rounds display
+        """
+        result = f'Level {self.level}:'
+        result = f'{result:<42}{self.calc_damage_per_round():>5.2f} Average DPR\n'
+
+        if len(self.description) > 0:
+            result += f'    {self.description}\n\n'
+
+        if verbose:
+            for round in self.rounds:
+                result += f'{round.display()}\n'
+
+        return result
 
 def validate_rounds(rounds: list[Round], combat_length: int):
         """
@@ -73,7 +89,7 @@ def validate_rounds(rounds: list[Round], combat_length: int):
                     If not round 1, duplicate previous round
                     i == 2
                     len(round_list) == 1
-                    need round_list[0]
+                    need round_list[0] (i-2)
                     """
-                    round_list.append(round_list[0].duplicate_round(i))
+                    round_list.append(round_list[i-2].duplicate_round(i))
         return round_list
