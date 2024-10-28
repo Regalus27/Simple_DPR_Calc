@@ -53,6 +53,12 @@ class Combat:
                 result += f'{round.display()}\n'
 
         return result
+    
+    def duplicate_combat(self, new_level):
+        return Combat(new_level, self.rounds)
+    
+    def get_level(self):
+        return self.level
 
 def validate_rounds(rounds: list[Round], combat_length: int):
         """

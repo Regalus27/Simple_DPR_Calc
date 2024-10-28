@@ -1,4 +1,5 @@
 from Attack import Attack
+from Character import Character
 from Combat import Combat
 from DamageEvent import DamageEvent
 from Round import Round
@@ -7,16 +8,15 @@ def main():
     rounds = []
     # Level 1, Round 1, Attack 1
     # Booming Blade
-    rounds.append(Round(1, [Attack("Booming Blade", set_up_damage_events(1, 1, 1))], "Orc Rush, then Booming Blade"))
+    rounds.append(Round(1, set_up_attacks(1, 1), "Orc Rush, then Booming Blade"))
 
     # Level 1, Round 1, Attack 2
-    rounds.append(Round(2, [Attack("Booming Blade", set_up_damage_events(1, 1, 2))], "Hex, then Booming Blade."))
+    rounds.append(Round(2, set_up_attacks(1, 2), "Hex, then Booming Blade."))
 
-    level_one_combat = Combat(1, rounds, "Orc Rush and Booming Blade as an opener. Cast Hex Round 2.", )
+    level_one_combat = Combat(1, set_up_rounds(1), "Orc Rush and Booming Blade as an opener. Cast Hex Round 2.", )
 
-    print(level_one_combat.display(verbose=False))
-    print("Verbose Mode:")
-    print(level_one_combat.display(verbose=True))
+    doug_warlock = Character("Doug Dugorok", set_up_combats(1))
+    doug_warlock.graph_damage_per_combat()
 
 # Level 5 test
 def get_proficiency_mod(level: int):
@@ -52,14 +52,35 @@ def get_stat_mod(level: int):
             mod = 0
     return mod
 
-def set_up_combats():
-    pass
+def set_up_combats(level: int):
+    result = []
+    match level:
+        case 1:
+            result.append(Combat(1, set_up_rounds(1), "Orc Rush, then Hex. Booming Blade DPR."))
+        case _:
+            pass
+    return result
 
-def set_up_rounds():
-    pass
+def set_up_rounds(level: int):
+    result = []
+    match level:
+        case 1:
+            result.append(Round(1, set_up_attacks(1, 1), "Orc Rush, Booming Blade"))
+            result.append(Round(1, set_up_attacks(1, 2), "Hex, Booming Blade"))
+        case _:
+            pass
+    return result
 
-def set_up_attacks():
-    pass
+def set_up_attacks(level: int, round_number: int):
+    result = []
+    match (level, round_number):
+        case (1, 1):
+            result.append(Attack("Booming Blade", set_up_damage_events(1, 1, 1)))
+        case (1, 2):
+            result.append(Attack("Booming Blade", set_up_damage_events(1, 1, 2)))
+        case _:
+            pass
+    return result
 
 def set_up_damage_events(level: int, attack_number: int, round_number: int):
     """
