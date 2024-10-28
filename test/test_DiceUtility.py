@@ -1,4 +1,4 @@
-from DiceUtility import calc_dice_average
+from Utility import calc_dice_average
 import unittest
 
 class DiceUtilityTest(unittest.TestCase):

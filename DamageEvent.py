@@ -1,4 +1,4 @@
-from DiceUtility import calc_dice_average
+from Utility import calc_dice_average
 
 class DamageEvent:
     def __init__(self, dice_quantity, dice_value, flat_value, name="Unknown Source",
@@ -86,5 +86,5 @@ class DamageEvent:
         
         # Formatting
         conditional = f'{self.conditional_chance:2.0%}'
-        return f'{self.name:<30}{self.dice_quantity:>2}d{self.dice_value:<2} + {self.flat_value:>2}, {average_damage:>5.2f} Average Damage, {conditional:>4} Conditional Chance'
+        return f'    {self.name:<26}{self.dice_quantity:>2}d{self.dice_value:<2} + {self.flat_value:>2}, {average_damage:>5.2f} Average Damage, {conditional:>4} Conditional Chance'
         
