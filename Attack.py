@@ -2,12 +2,15 @@ from DamageEvent import DamageEvent
 
 class Attack:
     def __init__(self, name: str, damage_events: list[DamageEvent], number_of_attacks=1, crit_chance=0.05, miss_chance=0.4):
-        self.name = name + ':'
-
         if number_of_attacks < 0:
             self.number_of_attacks = 0
         else:
             self.number_of_attacks = number_of_attacks
+
+        if self.number_of_attacks > 1:
+            self.name = f'{name} (x{self.number_of_attacks}):'
+        else:
+            self.name = f'{name}:'
         
         self.damage_events = damage_events
 

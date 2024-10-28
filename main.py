@@ -9,9 +9,9 @@ def main():
     temp_damage_events = []
     temp_damage_events.append(DamageEvent(2, 6, 4, name="+1 Greatsword"))
     temp_damage_events.append(DamageEvent(0, 8, 0, name="Booming Blade (Initial)"))
-    temp_damage_events.append(DamageEvent(1, 8, 0, name="Booming Blade (Detonation)", can_crit=False, conditional_chance=.25))
+    temp_damage_events.append(DamageEvent(1, 8, 0, name="Booming Blade (Trigger)", can_crit=False, conditional_chance=.25))
     booming_blade_attack = Attack("Booming Blade", temp_damage_events, 1)
-    rounds.append(Round(1, [booming_blade_attack], 1))
+    rounds.append(Round(1, [booming_blade_attack], "I cast Booming Blade."))
 
     for round in rounds:
         print(round.display())
