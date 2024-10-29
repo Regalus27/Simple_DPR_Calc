@@ -5,7 +5,7 @@ from DamageEvent import DamageEvent
 from Round import Round
 
 def main():
-    doug_warlock = Character("Doug Dugorok (Warlock, Delayed War Magic)", set_up_combats(), 14)
+    doug_warlock = Character("Doug Dugorok (Warlock, War Magic)", set_up_combats(), 14)
     doug_warlock.graph_damage_per_combat()
 
 """
@@ -161,11 +161,14 @@ def set_up_attacks(level: int, round_number: int):
             result.append(Attack("Greatsword", set_up_damage_events(level, 1, round_number), number_of_attacks=2, crit_chance=0.1))
 
         case (6, 1):
-            result.append(Attack("Greatsword", set_up_damage_events(level, 1, round_number), number_of_attacks=2))
+            result.append(Attack("Booming Blade", set_up_damage_events(level, 1, round_number), number_of_attacks=1))
+            result.append(Attack("Greatsword", set_up_damage_events(level, 2, round_number), number_of_attacks=1))
         case (6, 2):
-            result.append(Attack("Greatsword", set_up_damage_events(level, 1, round_number), number_of_attacks=2))
+            result.append(Attack("Booming Blade", set_up_damage_events(level, 1, round_number), number_of_attacks=1))
+            result.append(Attack("Greatsword", set_up_damage_events(level, 2, round_number), number_of_attacks=1))
         case (6, 3):
-            result.append(Attack("Greatsword", set_up_damage_events(level, 1, round_number), number_of_attacks=2, crit_chance=0.1))
+            result.append(Attack("Booming Blade", set_up_damage_events(level, 1, round_number), number_of_attacks=1, crit_chance=0.1))
+            result.append(Attack("Greatsword", set_up_damage_events(level, 2, round_number), number_of_attacks=1, crit_chance=0.1))
 
         case (7, 1):
             result.append(Attack("Booming Blade", set_up_damage_events(level, 1, round_number), number_of_attacks=1))
@@ -336,14 +339,28 @@ def set_up_damage_events(level: int, attack_number: int, round_number: int):
             result.append(DamageEvent(0, 0, get_proficiency_mod(level), "Hexblade's Curse"))
 
         case (6, 1, 1):
-            # Double greatsword swing, Orc Rush
+            # Orc Rush, Booming Blade (Repelling)
+            result.append(DamageEvent(2, 6, 1 + get_stat_mod(level), "+1 Greatsword"))
+            result.append(DamageEvent(1, 8, get_stat_mod(level), "Booming Blade"))
+            result.append(DamageEvent(2, 8, get_stat_mod(level), "Booming Blade (Triggered)", can_crit=False, conditional_chance=0.5))
+        case (6, 2, 1):
+            # Orc Rush, Greatsword only
             result.append(DamageEvent(2, 6, 1 + get_stat_mod(level), "+1 Greatsword"))
         case (6, 1, 2):
-            # Double greatsword swing, Hex
+            result.append(DamageEvent(2, 6, 1 + get_stat_mod(level), "+1 Greatsword"))
+            result.append(DamageEvent(1, 6, 0, "Hex"))
+            result.append(DamageEvent(1, 8, get_stat_mod(level), "Booming Blade"))
+            result.append(DamageEvent(2, 8, get_stat_mod(level), "Booming Blade (Triggered)", can_crit=False, conditional_chance=0.5))
+        case (6, 2, 2):
             result.append(DamageEvent(2, 6, 1 + get_stat_mod(level), "+1 Greatsword"))
             result.append(DamageEvent(1, 6, 0, "Hex"))
         case (6, 1, 3):
-            # Double greatsword swing, Hex, Hexblade's Curse
+            result.append(DamageEvent(2, 6, 1 + get_stat_mod(level), "+1 Greatsword"))
+            result.append(DamageEvent(1, 6, 0, "Hex"))
+            result.append(DamageEvent(0, 0, get_proficiency_mod(level), "Hexblade's Curse"))
+            result.append(DamageEvent(1, 8, get_stat_mod(level), "Booming Blade"))
+            result.append(DamageEvent(2, 8, get_stat_mod(level), "Booming Blade (Triggered)", can_crit=False, conditional_chance=0.5))
+        case (6, 2, 3):
             result.append(DamageEvent(2, 6, 1 + get_stat_mod(level), "+1 Greatsword"))
             result.append(DamageEvent(1, 6, 0, "Hex"))
             result.append(DamageEvent(0, 0, get_proficiency_mod(level), "Hexblade's Curse"))
