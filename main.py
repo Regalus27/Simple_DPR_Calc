@@ -1,5 +1,6 @@
 from Character import Character
 from characters.DougWarlockWarMagicUpdated import DougWarlockWarMagicUpdated
+from characters.DougWarlockNoWarMagic import DougWarlockNoWarMagic
 from characters.DougEldritchKnight import DougEldritchKnight
 from itertools import cycle
 import matplotlib.pyplot as plt
@@ -7,12 +8,17 @@ import matplotlib.pyplot as plt
 def main():
     characters = []
 
-    doug_warlock = DougWarlockWarMagicUpdated(20).get_character()
-    characters.append(doug_warlock)
+    # op homebrew idea (but now we know that it is op)
+    # doug_warlock_op = DougWarlockWarMagicUpdated(20).get_character()
+    # characters.append(doug_warlock_op)
     
     doug_ek = DougEldritchKnight(20).get_character()
     characters.append(doug_ek)
     
+    # unoptimized
+    doug_warlock = DougWarlockNoWarMagic(20).get_character()
+    characters.append(doug_warlock)
+
     graph_damage_per_character(characters)
 
 def graph_damage_per_character(characters: list[Character]):

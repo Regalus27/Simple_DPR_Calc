@@ -1,10 +1,7 @@
 from Attack import Attack
-from Character import Character
 from characters.CharacterLoader import CharacterLoader
-from Combat import Combat
 from DamageEvent import DamageEvent
-from Round import Round
-from Utility import get_proficiency_mod, get_stat_mod, validate_level
+from Utility import get_proficiency_mod, get_stat_mod, advantage_chance_recursive, validate_level
 
 class DougEldritchKnight(CharacterLoader):
     def __init__(self, level_max=20):
@@ -15,6 +12,9 @@ class DougEldritchKnight(CharacterLoader):
     def set_up_attacks(self, level: int, round_number: int):
         return old_set_up_attacks(level, round_number)
 
+"""
+This only exists like this because I didn't want to add self. to every single command after this
+"""
 def old_set_up_attacks(level: int, round_number: int):
     level = validate_level(level)
 
@@ -29,7 +29,6 @@ def old_set_up_attacks(level: int, round_number: int):
             return [
                 Attack("Booming Blade", [
                     get_greatsword_damage_event(level),
-                    get_hex_damage_event(round_number),
                     get_booming_blade_initial_damage_event(level),
                     get_booming_blade_triggered_damage_event(level)
                 ])
@@ -38,47 +37,54 @@ def old_set_up_attacks(level: int, round_number: int):
             return [
                 Attack("Greatsword", [
                     get_greatsword_damage_event(level),
-                    get_hex_damage_event(round_number)
                 ], number_of_attacks=2)
             ]
         case level if level >= 7 and level <= 10:
             return [
                 Attack("Booming Blade", [
                     get_greatsword_damage_event(level),
-                    get_hex_damage_event(round_number),
                     get_booming_blade_initial_damage_event(level),
                     get_booming_blade_triggered_damage_event(level)
                 ]),
                 Attack("Greatsword", [
                     get_greatsword_damage_event(level),
-                    get_hex_damage_event(round_number)
                 ])
             ]
-        case level if level >= 11 and level <= 19:
+        case level if level >= 11 and level <= 12:
             return [
                 Attack("Booming Blade", [
                     get_greatsword_damage_event(level),
-                    get_hex_damage_event(round_number),
                     get_booming_blade_initial_damage_event(level),
                     get_booming_blade_triggered_damage_event(level)
                 ]),
                 Attack("Greatsword", [
                     get_greatsword_damage_event(level),
-                    get_hex_damage_event(round_number)
                 ], number_of_attacks=2)
             ]
-        case 20:
+        # studied attacks
+        case level if level >= 13 and level <= 19:
+            previous_attacks = (round_number - 1) * 3
             return [
-                Attack("Booming Blade", [
-                    get_greatsword_damage_event(level),
-                    get_hex_damage_event(round_number),
-                    get_booming_blade_initial_damage_event(level),
-                    get_booming_blade_triggered_damage_event(level)
-                ]),
                 Attack("Greatsword", [
                     get_greatsword_damage_event(level),
-                    get_hex_damage_event(round_number)
-                ], number_of_attacks=3)
+                ], number_of_attacks=2, use_studied_attacks=True, studied_attacks_advantage_chance=advantage_chance_recursive(previous_attacks)),
+                Attack("Booming Blade", [
+                    get_greatsword_damage_event(level),
+                    get_booming_blade_initial_damage_event(level),
+                    get_booming_blade_triggered_damage_event(level)
+                ], use_studied_attacks=True, studied_attacks_advantage_chance=advantage_chance_recursive(previous_attacks + 2))
+            ]
+        case 20:
+            previous_attacks = (round_number - 1) * 4
+            return [
+                Attack("Greatsword", [
+                    get_greatsword_damage_event(level),
+                ], number_of_attacks=3, use_studied_attacks=True, studied_attacks_advantage_chance=advantage_chance_recursive(previous_attacks)),
+                Attack("Booming Blade", [
+                    get_greatsword_damage_event(level),
+                    get_booming_blade_initial_damage_event(level),
+                    get_booming_blade_triggered_damage_event(level)
+                ], use_studied_attacks=True, studied_attacks_advantage_chance=advantage_chance_recursive(previous_attacks + 3))
             ]
         case _:
             Attack("Unknown", [])
@@ -125,82 +131,3 @@ def get_greatsword_damage_event(level: int, graze_active=True):
 
     return DamageEvent(2, 6, 1 + get_stat_mod(level) + (get_proficiency_mod(level) if level >= 6 else 0),
                         "+1 Greatsword", damage_on_miss=damage_on_miss)
-
-def get_hex_damage_event(round_number: int):
-    if round_number > 1:
-        return DamageEvent(1, 6, 0, "Hex")
-    return DamageEvent(0, 0, 0, "Hex (Uncast)")
-"""
-Could I define specific common damage sources and just use those?
-    Booming Blade
-    +1 Greatsword
-Or rather, I could set up specific common attacks and set up automatic scaling?
-    Booming Blade
-        Greatsword Hit
-        Booming Blade (Initial)
-        Booming Blade (Triggered)
-What about Hex, Hexblade's Curse, other temporary effects?
-    Attack Modifier?
-    Just another Damage Event added to the list?
-Goal here would be to be able to say at the combat level:
-    Level 5:
-        Greatsword Attack x2
-        Add Hex Damage starting round 2
-And have it just work.
-    Level 1:
-        Greatsword Attack x1
-    Level 2: 
-        Greatsword Attack x1
-    Level 3:
-        Booming Blade x1 (mid chance, tactical mind)
-        Hex & Booming Blade beginning Round 2
-    Level 4:
-        Booming Blade x1
-        Hex & Booming Blade beginning Round 2
-    Level 5:
-        Greatsword x2
-        Hex Round 2
-    Level 6:
-        Greatsword x2
-        Hex Round 2
-    Level 7:
-        Greatsword x1
-        Booming Blade x1
-        Hex Round 2
-    Level 8:
-        Greatsword x1
-        Booming Blade x1
-        Hex Round 2
-    Level 9:
-        Greatsword x1
-        Booming Blade x1 (Push weapons, 50%, lose Graze on first attack?)
-        Hex Round 2
-    Level 10:
-        Greatsword x1
-        Booming Blade x1
-        Hex Round 2
-    Level 11:
-        Greatsword x2
-        Booming Blade x1
-        Hex Round 2
-    Level 12:
-        Greatsword x2
-        Booming Blade x1
-        Hex Round 2
-    Level 13:
-        STUDIED ATTACKS OH NO
-            chance to miss w/ advantage: .105
-            chance to hit w/ advantage:  .7975
-            chance to crit w/ advantage: .0975
-            sums to:                    1.0
-            but how to know when to apply this bonus?
-                assumes always attacking the same target
-                
-        Greatsword x2
-        Booming Blade x1
-        Hex Round 2
-    Level 14:
-        Greatsword x2
-        Booming Blade x1
-        Hex Round 2
-"""
