@@ -1,3 +1,24 @@
+"""
+Studied Attacks (Fighter 13)
+This returns the chance for an attack to have advantage based on the chance that the previous attack had advantage.
+This took me hours to figure out so I really hope it works.
+f(0) = 0
+f(x) = ((1 - f(x - 1)) * miss_chance) + (f(x - 1) * miss_chance ** 2)
+
+I should make this a proper recursive function
+(loops_remaining, miss_chance, last_chance=0)
+chance = ((1 - last_chance) * miss_chance) + (last_chance * miss_chance**2)
+if loops_remaining > 0:
+    return advantage_chance_recursive(loops_remaining - 1, miss_chance, last_chance=chance)
+return chance
+"""
+def advantage_chance_recursive(attacks_made: int, miss_chance=0.4, last_chance=0):
+    chance = last_chance
+    if attacks_made > 0:
+        chance = ((1 - last_chance) * miss_chance) + (last_chance * miss_chance**2)
+        return advantage_chance_recursive(attacks_made - 1, miss_chance, last_chance=chance)
+    return chance
+
 def calc_dice_average(dice_quantity: int, dice_value: int):
     if dice_quantity <= 0:
         return 0
@@ -46,3 +67,10 @@ def validate_level(level: int):
     if level > 20:
         return 20
     return level
+
+def validate_percentage(percentage: float):
+    if percentage < 0:
+        return 0
+    if percentage > 1:
+        return 1
+    return percentage
