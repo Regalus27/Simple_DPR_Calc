@@ -1,48 +1,21 @@
 from Attack import Attack
 from Character import Character
+from characters.CharacterLoader import CharacterLoader
 from Combat import Combat
 from DamageEvent import DamageEvent
 from Round import Round
-from characters.CharacterLoader import CharacterLoader
 from Utility import get_proficiency_mod, get_stat_mod, validate_level
 
 class DougEldritchKnight(CharacterLoader):
-    def get_character(max_level: int):
-        max_level = validate_level(max_level)
-        return Character("Doug Eldritch Knight", set_up_combats(max_level), max_level)
+    def __init__(self, level_max=20):
+        self.level_max = validate_level(level_max)
+        self.name = "Eldritch Knight"
+        super().__init__(self.name, self.level_max)
     
-def set_up_combats(max_level: int):
-    max_level = validate_level(max_level)
-    result = []
+    def set_up_attacks(self, level: int, round_number: int):
+        return old_set_up_attacks(level, round_number)
 
-    for i in range(1, max_level + 1):
-        result.append(Combat(i, set_up_rounds(i), set_up_combat_description(i)))
-    
-    return result
-
-def set_up_combat_description(level: int):
-    level = validate_level(level)
-
-    match level:
-        case _:
-            return ""
-        
-def set_up_rounds(level: int, max_rounds=4):
-    level = validate_level(level)
-    
-    if max_rounds < 1:
-        max_rounds = 1
-    elif max_rounds > 50:
-        max_rounds = 50
-
-    rounds = []
-
-    for round in range(1, max_rounds + 1):
-        rounds.append(Round(round, set_up_attacks(level, round)))
-
-    return rounds
-
-def set_up_attacks(level: int, round_number: int):
+def old_set_up_attacks(level: int, round_number: int):
     level = validate_level(level)
 
     match level:

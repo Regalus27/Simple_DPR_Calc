@@ -1,14 +1,14 @@
 from Character import Character
-from characters.DougWarlockWarMagic import DougWarlockWarMagic
+from characters.DougWarlockWarMagicUpdated import DougWarlockWarMagicUpdated
 from characters.DougEldritchKnight import DougEldritchKnight
 from itertools import cycle
 import matplotlib.pyplot as plt
 
 def main():
-    doug_warlock = DougWarlockWarMagic.get_character(20)
+    doug_warlock = DougWarlockWarMagicUpdated(20).get_character()
     # doug_warlock.graph_damage_per_combat()
 
-    doug_ek = DougEldritchKnight.get_character(20)
+    doug_ek = DougEldritchKnight(20).get_character()
     # doug_ek.graph_damage_per_combat(20)
 
     characters = []
