@@ -9,7 +9,7 @@ from Utility import get_proficiency_mod, get_stat_mod, validate_level
 class DougWarlockWarMagicUpdated(CharacterLoader):
     def __init__(self, level_max=20):
         self.level_max = validate_level(level_max)
-        self.name = "Doug (OP Warlock w/ War Magic)"
+        self.name = "OP Warlock w/ War Magic"
         super().__init__(self.name, self.level_max)
 
     def set_up_attacks(self, level: int, round_number: int):
