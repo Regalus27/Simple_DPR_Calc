@@ -8,13 +8,13 @@ class Character:
         self.max_level = validate_level(max_level)
         self.combats = validate_combats(combats, self.max_level)
 
-    def graph_damage_per_combat(self):
+    def graph_damage_per_combat(self, verbose=False):
         plot_x = [] # level
         plot_y = [] # damage number
         for i in range(1, len(self.combats) + 1):
             plot_x.append(i) # Level
             plot_y.append(self.combats[i-1].calc_damage_per_round()) # DPR
-            print(self.combats[i-1].display(True))
+            print(self.combats[i-1].display(verbose))
         plt.plot(plot_x, plot_y)
         plt.axis((1, self.max_level, 0, 100))
         plt.xlabel('Level')
