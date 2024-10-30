@@ -3,10 +3,9 @@ from Character import Character
 from Combat import Combat
 from DamageEvent import DamageEvent
 from Round import Round
-from characters.CharacterLoader import CharacterLoader
 from Utility import get_proficiency_mod, get_stat_mod, validate_level
 
-class DougEldritchKnight(CharacterLoader):
+class DougEldritchKnight():
     def get_character(max_level: int):
         max_level = validate_level(max_level)
         return Character("Doug Eldritch Knight", set_up_combats(max_level), max_level)

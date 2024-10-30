@@ -3,10 +3,9 @@ from Character import Character
 from Combat import Combat
 from DamageEvent import DamageEvent
 from Round import Round
-from characters.CharacterLoader import CharacterLoader
 from Utility import get_proficiency_mod, get_stat_mod, validate_level
 
-class DougWarlockWarMagic(CharacterLoader):
+class DougWarlockWarMagic():
     def get_character(max_level=14):
         max_level = validate_level(max_level)
         return Character("Doug Dugorok (Warlock, War Magic)", set_up_combats(), max_level)
