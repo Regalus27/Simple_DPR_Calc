@@ -1,4 +1,4 @@
-from Utility import calc_dice_average
+from Utility import calc_dice_average, validate_percentage
 
 class DamageEvent:
     def __init__(self, dice_quantity, dice_value, flat_value, name="Unknown Source",

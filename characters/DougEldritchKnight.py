@@ -1,7 +1,7 @@
 from Attack import Attack
 from characters.CharacterLoader import CharacterLoader
 from DamageEvent import DamageEvent
-from Utility import get_proficiency_mod, get_stat_mod, advantage_chance_recursive, validate_level
+from Utility import get_proficiency_mod, get_stat_mod, advantage_chance_recursive, great_weapon_master_attack_chance, validate_level, validate_percentage
 
 class DougEldritchKnight(CharacterLoader):
     def __init__(self, level_max=20):
@@ -33,11 +33,20 @@ def old_set_up_attacks(level: int, round_number: int):
                     get_booming_blade_triggered_damage_event(level)
                 ])
             ]
-        case level if level >= 5 and level <= 6:
+        case 5:
             return [
                 Attack("Greatsword", [
                     get_greatsword_damage_event(level),
                 ], number_of_attacks=2)
+            ]
+        case 6:
+            return [
+                Attack("Greatsword", [
+                    get_greatsword_damage_event(level),
+                ], number_of_attacks=2),
+                Attack("Great Weapon Mastery", [
+                    get_great_weapon_mastery_damage_event(level, 2, graze=True),
+                ])
             ]
         case level if level >= 7 and level <= 10:
             return [
@@ -48,6 +57,9 @@ def old_set_up_attacks(level: int, round_number: int):
                 ]),
                 Attack("Greatsword", [
                     get_greatsword_damage_event(level),
+                ]),
+                Attack("Great Weapon Mastery", [
+                    get_great_weapon_mastery_damage_event(level, 2, graze=True),
                 ])
             ]
         case level if level >= 11 and level <= 12:
@@ -59,7 +71,10 @@ def old_set_up_attacks(level: int, round_number: int):
                 ]),
                 Attack("Greatsword", [
                     get_greatsword_damage_event(level),
-                ], number_of_attacks=2)
+                ], number_of_attacks=2),
+                Attack("Great Weapon Mastery", [
+                    get_great_weapon_mastery_damage_event(level, 3, graze=True),
+                ])
             ]
         # studied attacks
         case level if level >= 13 and level <= 19:
@@ -72,7 +87,10 @@ def old_set_up_attacks(level: int, round_number: int):
                     get_greatsword_damage_event(level),
                     get_booming_blade_initial_damage_event(level),
                     get_booming_blade_triggered_damage_event(level)
-                ], use_studied_attacks=True, studied_attacks_advantage_chance=advantage_chance_recursive(previous_attacks + 2))
+                ], use_studied_attacks=True, studied_attacks_advantage_chance=advantage_chance_recursive(previous_attacks + 2)),
+                Attack("Great Weapon Mastery", [
+                    get_great_weapon_mastery_damage_event(level, 3, studied_attacks=True, graze=True),
+                ])
             ]
         case 20:
             previous_attacks = (round_number - 1) * 4
@@ -84,7 +102,10 @@ def old_set_up_attacks(level: int, round_number: int):
                     get_greatsword_damage_event(level),
                     get_booming_blade_initial_damage_event(level),
                     get_booming_blade_triggered_damage_event(level)
-                ], use_studied_attacks=True, studied_attacks_advantage_chance=advantage_chance_recursive(previous_attacks + 3))
+                ], use_studied_attacks=True, studied_attacks_advantage_chance=advantage_chance_recursive(previous_attacks + 3)),
+                Attack("Great Weapon Mastery", [
+                    get_great_weapon_mastery_damage_event(level, 4, studied_attacks=True, graze=True),
+                ])
             ]
         case _:
             Attack("Unknown", [])
@@ -131,3 +152,16 @@ def get_greatsword_damage_event(level: int, graze_active=True):
 
     return DamageEvent(2, 6, 1 + get_stat_mod(level) + (get_proficiency_mod(level) if level >= 6 else 0),
                         "+1 Greatsword", damage_on_miss=damage_on_miss)
+
+def get_great_weapon_mastery_damage_event(level: int, number_of_attacks_this_round: int, miss_chance=0.4, crit_chance=0.05,
+                                    studied_attacks=False, initial_advantage_chance=0, graze=False):
+    level = validate_level(level)
+    miss_chance = validate_percentage(miss_chance)
+    crit_chance = validate_percentage(crit_chance)
+
+    activation_chance = great_weapon_master_attack_chance(number_of_attacks_this_round, miss_chance, crit_chance, studied_attacks, initial_advantage_chance)
+    damage_on_miss = 0
+    if graze:
+        damage_on_miss = get_stat_mod(level)
+    
+    return DamageEvent(2, 6, 1 + get_stat_mod(level), "+1 Greatsword (GWM BA)", damage_on_miss=damage_on_miss, conditional_chance=activation_chance)
