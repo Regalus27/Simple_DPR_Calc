@@ -1,7 +1,7 @@
 from Attack import Attack
 from DamageEvent import DamageEvent
 from characters.CharacterLoader import CharacterLoader
-from Utility import get_proficiency_mod, get_stat_mod, validate_level
+from Utility import get_proficiency_mod, get_stat_mod, great_weapon_master_attack_chance, validate_level, validate_percentage
 
 class DougWarlockNoWarMagic(CharacterLoader):
     def __init__(self, level_max=20):
@@ -43,9 +43,11 @@ class DougWarlockNoWarMagic(CharacterLoader):
                 return [
                     Attack("Greatsword", [
                         self.get_greatsword_damage_event(level),
-                        self.get_hex_damage_event(round_number),
                         self.get_hexblade_curse_damage_event(level, round_number)
-                    ], number_of_attacks=3)
+                    ], number_of_attacks=3, crit_chance=.1),
+                    Attack("Great Weapon Mastery", [
+                        self.get_great_weapon_mastery_damage_event(level, 3, )
+                    ], number_of_attacks=3, crit_chance=.1),
                 ]
             case _:
                 return []
@@ -115,12 +117,12 @@ class DougWarlockNoWarMagic(CharacterLoader):
         return DamageEvent(2, 6, flat_damage, "+1 Greatsword")
     
     def get_hex_damage_event(self, round_number: int):
-        if round_number >= 2:
+        if round_number >= 3:
             return DamageEvent(1, 6, 0, "Hex")
         return DamageEvent(0, 0, 0, "Hex (Uncast)")
     
     def get_hexblade_curse_damage_event(self, level: int, round_number: int):
-        if round_number >= 3 and level >= 3:
+        if round_number >= 2 and level >= 3:
             return DamageEvent(0, 0, get_proficiency_mod(level), "Hexblade's Curse")
         return DamageEvent(0, 0, 0, "Hexblade's Curse (Uncast)")
     
@@ -128,3 +130,16 @@ class DougWarlockNoWarMagic(CharacterLoader):
         if level >= 9:
             return DamageEvent(1, 8, 0, "Lifedrinker Invocation")
         return DamageEvent(0, 0, 0, "Lifedrinker Invocation (Too low Level)")
+    
+    def get_great_weapon_mastery_damage_event(self, level: int, number_of_attacks_this_round: int, miss_chance=0.4, crit_chance=0.05,
+                                    studied_attacks=False, initial_advantage_chance=0, graze=False):
+        level = validate_level(level)
+        miss_chance = validate_percentage(miss_chance)
+        crit_chance = validate_percentage(crit_chance)
+
+        activation_chance = great_weapon_master_attack_chance(number_of_attacks_this_round, miss_chance, crit_chance, studied_attacks, initial_advantage_chance)
+        damage_on_miss = 0
+        if graze:
+            damage_on_miss = get_stat_mod(level)
+        
+        return DamageEvent(2, 6, 1 + get_stat_mod(level), "+1 Greatsword (GWM BA)", damage_on_miss=damage_on_miss, conditional_chance=activation_chance)

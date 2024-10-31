@@ -2,7 +2,8 @@ from DamageEvent import DamageEvent
 from Utility import advantage_chance_recursive, validate_percentage
 
 class Attack:
-    def __init__(self, name: str, damage_events: list[DamageEvent], number_of_attacks=1, crit_chance=0.05, miss_chance=0.4, use_studied_attacks=False, studied_attacks_advantage_chance=0):
+    def __init__(self, name: str, damage_events: list[DamageEvent], number_of_attacks=1, crit_chance=0.05, miss_chance=0.4, 
+                 use_studied_attacks=False, studied_attacks_advantage_chance=0):
         if number_of_attacks < 0:
             self.number_of_attacks = 0
         else:

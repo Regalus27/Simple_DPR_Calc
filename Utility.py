@@ -61,6 +61,29 @@ def get_stat_mod(level: int):
             mod = 0
     return mod
 
+"""
+Chance to have landed a critical strike this turn for the purposes of Great Weapon Master, getting an extra attack as a bonus action
+"""
+def great_weapon_master_attack_chance(number_of_attacks: int, miss_chance=0.4, crit_chance=0.05, studied_attacks=False, initial_advantage_chance=0):
+    if number_of_attacks < 1:
+        return 0
+    if not studied_attacks:
+        return 1 - (1 - crit_chance) ** number_of_attacks
+    # If studied attacks
+    cumulative_chance = 1
+    for i in range(1, number_of_attacks + 1):
+        # Calculate weighted crit chance w/ no advantage chance
+        no_advantage_crit_chance = (1 - initial_advantage_chance) * crit_chance
+        # Calculate weighted crit chance w/ advantage chance
+        advantage_crit_chance = initial_advantage_chance * (1 - (1 - crit_chance) ** 2)
+        # Update the chance to not crit w/ each attack
+        cumulative_chance *= 1 - (advantage_crit_chance + no_advantage_crit_chance)
+        # Update initial advantage chance, as it is now going to be used to store the previous advantage chance
+        initial_advantage_chance = advantage_chance_recursive(i, miss_chance=miss_chance, last_chance=initial_advantage_chance)
+    # Reverse to get cumulative chance to have crit
+    cumulative_chance = 1 - cumulative_chance
+    return cumulative_chance
+
 def validate_level(level: int):
     if level < 1:
         return 1
