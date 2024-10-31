@@ -1,11 +1,7 @@
 from Character import Character
-from characters.DougWarlockWarMagicUpdated import DougWarlockWarMagicUpdated
-from characters.DougWarlockNoWarMagic import DougWarlockNoWarMagic
 from characters.DougEldritchKnight import DougEldritchKnight
 from itertools import cycle
 import matplotlib.pyplot as plt
-from Utility import great_weapon_master_attack_chance
-from characters.DougEldritchKnight import get_great_weapon_mastery_damage_event
 
 def main():
     characters = []
@@ -29,6 +25,7 @@ def graph_damage_per_character(characters: list[Character]):
         plt.plot(plot_x, plot_y, color=next(cycle_colors), label=character.name)
     
     plt.xlabel("Level")
+    plt.xticks([1, 5, 10, 15, 20])
     plt.ylabel("Average Damage Per Round")
     plt.suptitle("Character DPR Comparison")
     plt.legend()
